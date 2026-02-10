@@ -3,20 +3,21 @@ import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 
 class TransactionTile extends StatefulWidget {
-  final IconData icon;
+  final String imageUrl;
   final String itemName;
-  final String time;
+  final String changeParcentage;
   final double itemPrice;
-  // final Color priceColor;
+  final Color changeParcentageColor;
+  final IconData changeParcentageIcon;
 
-  const TransactionTile({
-    super.key,
-    required this.icon,
-    required this.itemName,
-    required this.time,
-    required this.itemPrice,
-    // required this.priceColor,
-  });
+  const TransactionTile(
+      {super.key,
+      required this.imageUrl,
+      required this.itemName,
+      required this.changeParcentage,
+      required this.itemPrice,
+      required this.changeParcentageColor,
+      required this.changeParcentageIcon});
 
   @override
   State<TransactionTile> createState() => _TransactionTileState();
@@ -37,14 +38,16 @@ class _TransactionTileState extends State<TransactionTile> {
         NumberFormat.currency(locale: 'en_US', symbol: '\$')
             .format(widget.itemPrice);
     return GestureDetector(
-      onTap: () {
+      onTap: () async {
+        
         Navigator.push(
           context,
           MaterialPageRoute(
             builder: (context) => TransactionDetailsScreen(
+              image: widget.imageUrl,
               itemName: widget.itemName,
               price: widget.itemPrice,
-              time: widget.time,
+              changeParcentage: widget.changeParcentage,
               // color: widget.priceColor,
             ),
           ),
@@ -70,13 +73,11 @@ class _TransactionTileState extends State<TransactionTile> {
           mainAxisAlignment: MainAxisAlignment.spaceAround,
           children: [
             CircleAvatar(
-              radius: 30,
-              child: Icon(
-                widget.icon,
-                color: Colors.black,
-              ),
+              radius: 25,
+              backgroundColor: Colors.grey.shade100,
+              backgroundImage: NetworkImage(widget.imageUrl),
             ),
-            const SizedBox(width: 5),
+            const SizedBox(width: 10),
             Expanded(
               child: Padding(
                 padding: const EdgeInsets.all(8.0),
@@ -88,16 +89,33 @@ class _TransactionTileState extends State<TransactionTile> {
                       widget.itemName,
                       style: TextStyle(
                         fontWeight: FontWeight.bold,
-                        fontSize: 20,
+                        fontSize: 18,
                       ),
                     ),
-                    Text(
-                      widget.time,
-                      style: TextStyle(
-                        fontWeight: FontWeight.bold,
-                        color: Colors.grey,
-                        fontSize: 12,
-                      ),
+                    SizedBox(
+                      height: 2,
+                    ),
+                    Row(
+                      mainAxisSize: MainAxisSize.min,
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Icon(
+                          widget.changeParcentageIcon,
+                          size: 26,
+                          color: widget.changeParcentageColor,
+                        ),
+                        SizedBox(
+                          width: 4,
+                        ),
+                        Text(
+                          widget.changeParcentage,
+                          style: TextStyle(
+                            fontWeight: FontWeight.bold,
+                            color: widget.changeParcentageColor,
+                            fontSize: 14,
+                          ),
+                        ),
+                      ],
                     )
                   ],
                 ),

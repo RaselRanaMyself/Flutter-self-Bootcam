@@ -13,67 +13,54 @@ class AddCoinSection extends StatefulWidget {
 class _AddCoinSectionState extends State<AddCoinSection> {
   bool isAdding = false;
   TextEditingController coinController = TextEditingController();
+  final FocusNode _focusNode = FocusNode();
 
   void _handleAddCoin() async {
     String input = coinController.text.toLowerCase().trim();
     if (input.isEmpty) return;
+
     setState(() {
       isAdding = true;
     });
     FocusScope.of(context).unfocus();
-    Map<String, String> localMap = {
-      'btc': 'bitcoin',
-      'eth': 'ethereum',
-      'sol': 'solana',
-      'bnb': 'binancecoin',
-      'doge': 'dogecoin',
-    };
 
-    String coinID = input;
-    String coinSymbol = input;
-    String coinName = input;
+    var searchResult = await CryptoService().searchCoin(input);
 
-    if (localMap.containsKey(input)) {
-      coinID = localMap[input]!;
-      coinSymbol = input;
-      coinName = coinID;
-    } else {
-      var searchResult = await CryptoService().searchCoin(input);
-      if (searchResult != null) {
-        coinID = searchResult['id'] ?? input;
-        coinSymbol = searchResult['symbol'] ?? input;
-        coinName = searchResult['name'] ?? input;
+    if (searchResult != null) {
+      String coinId = searchResult['id'] ?? "";
+      String name = searchResult['name'] ?? "";
+
+      List<dynamic> marketData = await CryptoService().getMarketData([coinId]);
+
+      if (marketData.isNotEmpty) {
+        var data = marketData[0];
+        Coin newCoin = Coin(
+          id: coinId,
+          symbol: data['symbol'],
+          name: name,
+          image: data['image'], // 👈 মডেলে ছবি ঢোকালাম
+          price: (data['price'] as num?)?.toDouble() ?? 0.0,
+          changeParcentage: (data['change'] as num?)?.toDouble() ?? 0.0,
+        );
+
+        widget.onCoinAdded(newCoin);
+        coinController.clear();
+        FocusScope.of(context).unfocus();
       } else {
-        setState(() {
-          isAdding = false;
-        });
         if (mounted) {
           ScaffoldMessenger.of(context).showSnackBar(
             SnackBar(
-              content: Text("Coin not found!"),
+              content: Text("Price data unavailable for $name"),
             ),
           );
         }
-        return;
       }
-    }
-    double price = await CryptoService().getCoinPrice(coinID, 'usd');
-    if (price > 0) {
-      Coin newCoin = Coin(
-        id: coinID,
-        symbol: coinSymbol,
-        name: coinName,
-        price: price,
-      );
-
-      widget.onCoinAdded(newCoin);
-
-      coinController.clear();
     } else {
       if (mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(
-            content: Text("Price data unavailable for $coinName"),
+          const SnackBar(
+            content: Text("Coin not found! Check spelling."),
+            backgroundColor: Colors.orange,
           ),
         );
       }
@@ -82,11 +69,13 @@ class _AddCoinSectionState extends State<AddCoinSection> {
     setState(() {
       isAdding = false;
     });
+    FocusScope.of(context).unfocus();
   }
 
   @override
   void dispose() {
     coinController.dispose();
+    _focusNode.dispose();
     super.dispose();
   }
 
@@ -98,7 +87,12 @@ class _AddCoinSectionState extends State<AddCoinSection> {
         children: [
           Expanded(
             child: TextField(
-              controller: coinController, // ইনপুট কন্ট্রোলার
+              controller: coinController,
+              focusNode: _focusNode,
+              autofocus: false,
+              onTapOutside: (event) {
+                _focusNode.unfocus();
+              },
               decoration: InputDecoration(
                 hintText: "Enter coin name (e.g. bitcoin)",
                 border: OutlineInputBorder(),

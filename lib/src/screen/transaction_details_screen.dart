@@ -1,16 +1,18 @@
 import 'package:flutter/material.dart';
 
 class TransactionDetailsScreen extends StatelessWidget {
+  final String image;
   final String itemName;
   final double price;
-  final String time;
+  final String changeParcentage;
   // final Color color;
 
   const TransactionDetailsScreen({
     super.key,
+    required this.image,
     required this.itemName,
     required this.price,
-    required this.time,
+    required this.changeParcentage,
     // required this.color,
   });
 
@@ -31,8 +33,7 @@ class TransactionDetailsScreen extends StatelessWidget {
               CircleAvatar(
                 radius: 50,
                 backgroundColor: Colors.indigo.shade100,
-                child:
-                    const Icon(Icons.receipt, size: 50, color: Colors.indigo),
+                backgroundImage: NetworkImage(image),
               ),
               const SizedBox(height: 30),
 
@@ -44,7 +45,7 @@ class TransactionDetailsScreen extends StatelessWidget {
               ),
               const SizedBox(height: 10),
               Text(
-                time,
+                changeParcentage,
                 style: const TextStyle(fontSize: 18, color: Colors.grey),
               ),
               const SizedBox(height: 20),

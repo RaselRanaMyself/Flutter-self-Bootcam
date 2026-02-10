@@ -57,10 +57,15 @@ class CoinTile extends StatelessWidget {
 
       // ৫. চাইল্ড হিসেবে আপনার পুরনো সুন্দর ডিজাইনটি
       child: TransactionTile(
-        icon: Icons.monetization_on,
+        imageUrl: coin.image,
         itemName: coin.name.toUpperCase(),
-        time: "Live",
+        changeParcentage: "${(coin.changeParcentage).toStringAsFixed(2)}%",
         itemPrice: coin.price,
+        changeParcentageColor:
+            coin.changeParcentage >= 0 ? Colors.green : Colors.red,
+        changeParcentageIcon: coin.changeParcentage >= 0
+            ? Icons.arrow_drop_up
+            : Icons.arrow_drop_down,
       ),
     );
   }

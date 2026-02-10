@@ -5,6 +5,7 @@ import 'package:basic_landing_page/src/screen/components/balance_card.dart';
 import 'package:basic_landing_page/src/screen/components/coinTile.dart';
 import 'package:basic_landing_page/src/services/crypto_service.dart';
 import 'package:flutter/material.dart';
+import 'package:hive_flutter/hive_flutter.dart';
 import 'package:intl/intl.dart';
 
 // ... State ক্লাসের ভেতরে
@@ -18,9 +19,43 @@ class HomePage extends StatefulWidget {
 
 class _HomePageState extends State<HomePage> {
   double balance = 0;
-  // double ethcoinPrice = 0.0;
+  final myBox = Hive.box('cryptoBox');
   List<Coin> myCoinList = [];
   bool isRefreshing = false;
+
+  @override
+  void initState() {
+    super.initState();
+    loadData();
+  }
+
+  void loadData() {
+    List<dynamic> coinIds = myBox.get('myList', defaultValue: []);
+    if (coinIds.isNotEmpty) {
+      myCoinList.clear();
+      for (String id in coinIds) {
+        myCoinList.add(
+          Coin(
+            id: id,
+            symbol: id,
+            name: id,
+            image:
+                "https://assets.coingecko.com/coins/images/1/large/bitcoin.png",
+            price: 0,
+            changeParcentage: 0,
+          ),
+        );
+      }
+      setState(() {});
+      refreshAllCoinPrice();
+    }
+  }
+
+  void updateDatabase() {
+    List<String> coinIds = myCoinList.map((coin) => coin.id).toList();
+
+    myBox.put('myList', coinIds);
+  }
 
   void addMoney() async {
     final newAmount = await Navigator.push(
@@ -38,29 +73,34 @@ class _HomePageState extends State<HomePage> {
   }
 
   void refreshAllCoinPrice() async {
-    if (myCoinList.isEmpty) return;
+    List<String> coinIds = myCoinList.map((coin) => coin.id).toList();
+    if (coinIds.isEmpty) return;
 
     setState(() {
       isRefreshing = true;
     });
+    List<dynamic> marketData = await CryptoService().getMarketData(coinIds);
 
-    for (int i = 0; i < myCoinList.length; i++) {
-      String name = myCoinList[i].name;
-      double newPrice = await CryptoService().getCoinPrice(name, 'usd');
-
-      if (newPrice > 0) {
-        myCoinList[i].price = newPrice;
-      }
+    if (marketData.isNotEmpty) {
+      setState(() {
+        for (var data in marketData) {
+          print(data['price']);
+          Coin coinToUpdate =
+              myCoinList.firstWhere((element) => element.id == data['id']);
+          coinToUpdate.price = (data['price'] as num?)?.toDouble() ?? 0.0;
+          coinToUpdate.changeParcentage =
+              (data['price_change_percentage_24h'] as num?)?.toDouble() ?? 0.0;
+          coinToUpdate.image = data['image'];
+        }
+      });
+      setState(() {
+        isRefreshing = false;
+      });
     }
 
     setState(() {
       isRefreshing = false;
     });
-  }
-
-  @override
-  void initState() {
-    super.initState();
   }
 
   @override
@@ -92,10 +132,12 @@ class _HomePageState extends State<HomePage> {
       ),
       body: Column(
         children: [
-          AddCoinSection(onCoinAdded: (Coin notCoin) {
+          AddCoinSection(onCoinAdded: (Coin newCoin) {
             setState(() {
-              myCoinList.add(notCoin);
+              myCoinList.add(newCoin);
             });
+            updateDatabase();
+            refreshAllCoinPrice();
           }),
           BalanceCard(
             balance: formattedBalance,
@@ -118,6 +160,7 @@ class _HomePageState extends State<HomePage> {
                           content: Text("${currentCoin.name} removed!"),
                           duration: Duration(seconds: 1),
                         ));
+                        updateDatabase();
                       },
                     );
                   }),
