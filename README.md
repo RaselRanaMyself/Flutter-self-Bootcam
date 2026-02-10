@@ -1,17 +1,23 @@
-# basic_landing_page
+# 🚀 Crypto Tracker App
 
-A new Flutter project.
+A real-time cryptocurrency tracking application built with **Flutter**.
+Currently tracking live data for Bitcoin, Ethereum, and more using CoinGecko API.
 
-## Getting Started
+## 📱 Screenshots
+(এখানে পরে অ্যাপের ২-৩টি স্ক্রিনশট যোগ করবেন। দেখতে খুব প্রফেশনাল লাগে।)
 
-This project is a starting point for a Flutter application.
+## ✨ Features
+- 📈 **Real-time Data:** Fetches live prices using REST API.
+- 🎨 **Dynamic UI:** Clean interface with interactive list view.
+- 🔄 **Pull to Refresh:** Update prices instantly.
+- 🔍 **Search Functionality:** Find any coin easily.
+- 🛡️ **Null Safety:** robust error handling.
 
-A few resources to get you started if this is your first Flutter project:
+## 🛠️ Tech Stack
+- **Framework:** Flutter (Dart)
+- **API:** CoinGecko
+- **State Management:** SetState (Migrating to Provider soon)
+- **Architecture:** MVC Pattern
 
-- [Lab: Write your first Flutter app](https://docs.flutter.dev/get-started/codelab)
-- [Cookbook: Useful Flutter samples](https://docs.flutter.dev/cookbook)
-
-For help getting started with Flutter development, view the
-[online documentation](https://docs.flutter.dev/), which offers tutorials,
-samples, guidance on mobile development, and a full API reference.
-# Flutter-self-Bootcam
+## 👨‍💻 Developer
+Developed by Md Rasel Rana
