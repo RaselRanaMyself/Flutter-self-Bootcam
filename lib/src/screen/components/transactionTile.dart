@@ -1,23 +1,15 @@
+import 'package:basic_landing_page/src/model/coin_model.dart';
 import 'package:basic_landing_page/src/screen/transaction_details_screen.dart';
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 
 class TransactionTile extends StatefulWidget {
-  final String imageUrl;
-  final String itemName;
-  final String changeParcentage;
-  final double itemPrice;
-  final Color changeParcentageColor;
-  final IconData changeParcentageIcon;
+  final Coin coin;
 
-  const TransactionTile(
-      {super.key,
-      required this.imageUrl,
-      required this.itemName,
-      required this.changeParcentage,
-      required this.itemPrice,
-      required this.changeParcentageColor,
-      required this.changeParcentageIcon});
+  const TransactionTile({
+    super.key,
+    required this.coin,
+  });
 
   @override
   State<TransactionTile> createState() => _TransactionTileState();
@@ -36,19 +28,16 @@ class _TransactionTileState extends State<TransactionTile> {
   Widget build(BuildContext context) {
     final formattedBalance =
         NumberFormat.currency(locale: 'en_US', symbol: '\$')
-            .format(widget.itemPrice);
+            .format(widget.coin.price
+                // widget.itemPrice,
+                );
     return GestureDetector(
       onTap: () async {
-        
         Navigator.push(
           context,
           MaterialPageRoute(
             builder: (context) => TransactionDetailsScreen(
-              image: widget.imageUrl,
-              itemName: widget.itemName,
-              price: widget.itemPrice,
-              changeParcentage: widget.changeParcentage,
-              // color: widget.priceColor,
+              coin: widget.coin,
             ),
           ),
         );
@@ -75,7 +64,7 @@ class _TransactionTileState extends State<TransactionTile> {
             CircleAvatar(
               radius: 25,
               backgroundColor: Colors.grey.shade100,
-              backgroundImage: NetworkImage(widget.imageUrl),
+              backgroundImage: NetworkImage(widget.coin.image),
             ),
             const SizedBox(width: 10),
             Expanded(
@@ -86,7 +75,7 @@ class _TransactionTileState extends State<TransactionTile> {
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
                     Text(
-                      widget.itemName,
+                      widget.coin.name,
                       style: TextStyle(
                         fontWeight: FontWeight.bold,
                         fontSize: 18,
@@ -100,18 +89,25 @@ class _TransactionTileState extends State<TransactionTile> {
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
                         Icon(
-                          widget.changeParcentageIcon,
+                          widget.coin.changeParcentage >= 0
+                              ? Icons.arrow_drop_up
+                              : Icons.arrow_drop_down,
                           size: 26,
-                          color: widget.changeParcentageColor,
+                          color: widget.coin.changeParcentage >= 0
+                              ? Colors.green
+                              : Colors.red,
                         ),
                         SizedBox(
                           width: 4,
                         ),
                         Text(
-                          widget.changeParcentage,
+                          "${widget.coin.changeParcentage.toStringAsFixed(2)}%"
+                              .toString(),
                           style: TextStyle(
                             fontWeight: FontWeight.bold,
-                            color: widget.changeParcentageColor,
+                            color: widget.coin.changeParcentage >= 0
+                                ? Colors.green
+                                : Colors.red,
                             fontSize: 14,
                           ),
                         ),

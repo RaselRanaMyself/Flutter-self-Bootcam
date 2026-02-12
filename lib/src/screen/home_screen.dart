@@ -1,4 +1,4 @@
-import 'package:basic_landing_page/src/moded/coin_model.dart';
+import 'package:basic_landing_page/src/model/coin_model.dart';
 import 'package:basic_landing_page/src/screen/add_money_screen.dart';
 import 'package:basic_landing_page/src/screen/components/add_coin_section.dart';
 import 'package:basic_landing_page/src/screen/components/balance_card.dart';
@@ -84,13 +84,21 @@ class _HomePageState extends State<HomePage> {
     if (marketData.isNotEmpty) {
       setState(() {
         for (var data in marketData) {
-          print(data['price']);
+          // print(data['price']);
           Coin coinToUpdate =
               myCoinList.firstWhere((element) => element.id == data['id']);
-          coinToUpdate.price = (data['price'] as num?)?.toDouble() ?? 0.0;
+          coinToUpdate.price =
+              (data['current_price'] as num?)?.toDouble() ?? 0.0;
           coinToUpdate.changeParcentage =
               (data['price_change_percentage_24h'] as num?)?.toDouble() ?? 0.0;
           coinToUpdate.image = data['image'];
+          coinToUpdate.marketCap =
+              (data['market_cap'] as num?)?.toDouble() ?? 0.0;
+          coinToUpdate.rank = (data['market_cap_rank'] as num?)?.toInt() ?? 0;
+          coinToUpdate.high24h = (data['high_24h'] as num?)?.toDouble() ?? 0.0;
+          coinToUpdate.low24h = (data['low_24h'] as num?)?.toDouble() ?? 0.0;
+          coinToUpdate.sparklineIn7d =
+              List<double>.from(data['sparkline_in_7d']['price']);
         }
       });
       setState(() {

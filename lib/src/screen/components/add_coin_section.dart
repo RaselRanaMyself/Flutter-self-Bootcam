@@ -1,4 +1,4 @@
-import 'package:basic_landing_page/src/moded/coin_model.dart';
+import 'package:basic_landing_page/src/model/coin_model.dart';
 import 'package:basic_landing_page/src/services/crypto_service.dart';
 import 'package:flutter/material.dart';
 
@@ -34,13 +34,20 @@ class _AddCoinSectionState extends State<AddCoinSection> {
 
       if (marketData.isNotEmpty) {
         var data = marketData[0];
+        // print("API DATA CHECK: $data");
         Coin newCoin = Coin(
           id: coinId,
           symbol: data['symbol'],
           name: name,
           image: data['image'], // 👈 মডেলে ছবি ঢোকালাম
-          price: (data['price'] as num?)?.toDouble() ?? 0.0,
-          changeParcentage: (data['change'] as num?)?.toDouble() ?? 0.0,
+          price: (data['current_price'] as num?)?.toDouble() ?? 0.0,
+          changeParcentage:
+              (data['price_change_percentage_24h'] as num?)?.toDouble() ?? 0.0,
+          marketCap: (data['market_cap'] as num?)?.toDouble() ?? 0.0,
+          rank: (data['market_cap_rank'] as num?)?.toInt() ?? 0,
+          high24h: (data['high_24h'] as num?)?.toDouble() ?? 0.0,
+          low24h: (data['low_24h'] as num?)?.toDouble() ?? 0.0,
+          sparklineIn7d: List<double>.from(data['sparkline_in_7d']['price']),
         );
 
         widget.onCoinAdded(newCoin);

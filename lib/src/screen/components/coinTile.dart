@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:basic_landing_page/src/moded/coin_model.dart'; // আপনার মডেল ইমপোর্ট করুন
+import 'package:basic_landing_page/src/model/coin_model.dart'; // আপনার মডেল ইমপোর্ট করুন
 import 'package:basic_landing_page/src/screen/components/transactionTile.dart'; // পুরনো ডিজাইন টাইল
 
 class CoinTile extends StatelessWidget {
@@ -57,15 +57,7 @@ class CoinTile extends StatelessWidget {
 
       // ৫. চাইল্ড হিসেবে আপনার পুরনো সুন্দর ডিজাইনটি
       child: TransactionTile(
-        imageUrl: coin.image,
-        itemName: coin.name.toUpperCase(),
-        changeParcentage: "${(coin.changeParcentage).toStringAsFixed(2)}%",
-        itemPrice: coin.price,
-        changeParcentageColor:
-            coin.changeParcentage >= 0 ? Colors.green : Colors.red,
-        changeParcentageIcon: coin.changeParcentage >= 0
-            ? Icons.arrow_drop_up
-            : Icons.arrow_drop_down,
+        coin: coin,
       ),
     );
   }
