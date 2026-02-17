@@ -1,5 +1,5 @@
 import 'package:basic_landing_page/src/model/coin_model.dart';
-import 'package:basic_landing_page/src/screen/transaction_details_screen.dart';
+// import 'package:basic_landing_page/src/screen/transaction_details_screen.dart';
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 
@@ -31,109 +31,97 @@ class _TransactionTileState extends State<TransactionTile> {
             .format(widget.coin.price
                 // widget.itemPrice,
                 );
-    return GestureDetector(
-      onTap: () async {
-        Navigator.push(
-          context,
-          MaterialPageRoute(
-            builder: (context) => TransactionDetailsScreen(
-              coin: widget.coin,
-            ),
+    return Container(
+      margin: EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+      padding: EdgeInsets.all(12),
+      decoration: BoxDecoration(
+        color: Colors.white,
+        borderRadius: BorderRadius.circular(12),
+        boxShadow: [
+          BoxShadow(
+            color: Colors.grey.withOpacity(0.1),
+            blurRadius: 5,
+            spreadRadius: 1,
           ),
-        );
-      },
-      child: Container(
-        margin: EdgeInsets.symmetric(horizontal: 16, vertical: 8),
-        padding: EdgeInsets.all(12),
-        decoration: BoxDecoration(
-          color: Colors.white,
-          borderRadius: BorderRadius.circular(12),
-          boxShadow: [
-            BoxShadow(
-              color: Colors.grey.withOpacity(0.1),
-              blurRadius: 5,
-              spreadRadius: 1,
-            ),
-          ],
-        ),
-        // height: 80,
-        child: Row(
-          // crossAxisAlignment: CrossAxisAlignment.start,
-          mainAxisAlignment: MainAxisAlignment.spaceAround,
-          children: [
-            CircleAvatar(
-              radius: 25,
-              backgroundColor: Colors.grey.shade100,
-              backgroundImage: NetworkImage(widget.coin.image),
-            ),
-            const SizedBox(width: 10),
-            Expanded(
-              child: Padding(
-                padding: const EdgeInsets.all(8.0),
-                child: Column(
-                  mainAxisSize: MainAxisSize.min,
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    Text(
-                      widget.coin.name,
-                      style: TextStyle(
-                        fontWeight: FontWeight.bold,
-                        fontSize: 18,
+        ],
+      ),
+      // height: 80,
+      child: Row(
+        // crossAxisAlignment: CrossAxisAlignment.start,
+        mainAxisAlignment: MainAxisAlignment.spaceAround,
+        children: [
+          CircleAvatar(
+            radius: 25,
+            backgroundColor: Colors.grey.shade100,
+            backgroundImage: NetworkImage(widget.coin.image),
+          ),
+          const SizedBox(width: 10),
+          Expanded(
+            child: Padding(
+              padding: const EdgeInsets.all(8.0),
+              child: Column(
+                mainAxisSize: MainAxisSize.min,
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Text(
+                    widget.coin.name,
+                    style: TextStyle(
+                      fontWeight: FontWeight.bold,
+                      fontSize: 18,
+                    ),
+                  ),
+                  SizedBox(
+                    height: 2,
+                  ),
+                  Row(
+                    mainAxisSize: MainAxisSize.min,
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Icon(
+                        widget.coin.changeParcentage >= 0
+                            ? Icons.arrow_drop_up
+                            : Icons.arrow_drop_down,
+                        size: 26,
+                        color: widget.coin.changeParcentage >= 0
+                            ? Colors.green
+                            : Colors.red,
                       ),
-                    ),
-                    SizedBox(
-                      height: 2,
-                    ),
-                    Row(
-                      mainAxisSize: MainAxisSize.min,
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        Icon(
-                          widget.coin.changeParcentage >= 0
-                              ? Icons.arrow_drop_up
-                              : Icons.arrow_drop_down,
-                          size: 26,
+                      SizedBox(
+                        width: 4,
+                      ),
+                      Text(
+                        "${widget.coin.changeParcentage.toStringAsFixed(2)}%"
+                            .toString(),
+                        style: TextStyle(
+                          fontWeight: FontWeight.bold,
                           color: widget.coin.changeParcentage >= 0
                               ? Colors.green
                               : Colors.red,
+                          fontSize: 14,
                         ),
-                        SizedBox(
-                          width: 4,
-                        ),
-                        Text(
-                          "${widget.coin.changeParcentage.toStringAsFixed(2)}%"
-                              .toString(),
-                          style: TextStyle(
-                            fontWeight: FontWeight.bold,
-                            color: widget.coin.changeParcentage >= 0
-                                ? Colors.green
-                                : Colors.red,
-                            fontSize: 14,
-                          ),
-                        ),
-                      ],
-                    )
-                  ],
-                ),
+                      ),
+                    ],
+                  )
+                ],
               ),
             ),
-            Text(
-              formattedBalance,
-              style: TextStyle(
-                fontWeight: FontWeight.bold,
-                fontSize: 20,
-                // color: widget.priceColor
-              ),
+          ),
+          Text(
+            formattedBalance,
+            style: TextStyle(
+              fontWeight: FontWeight.bold,
+              fontSize: 20,
+              // color: widget.priceColor
             ),
-            IconButton(
-              icon: Icon(
-                isLiked ? Icons.favorite : Icons.favorite_border,
-                color: isLiked ? Colors.red : Colors.grey,
-              ),
-              onPressed: onPressed,
+          ),
+          IconButton(
+            icon: Icon(
+              isLiked ? Icons.favorite : Icons.favorite_border,
+              color: isLiked ? Colors.red : Colors.grey,
             ),
-          ],
-        ),
+            onPressed: onPressed,
+          ),
+        ],
       ),
     );
   }

@@ -3,6 +3,7 @@ import 'package:basic_landing_page/src/screen/add_money_screen.dart';
 import 'package:basic_landing_page/src/screen/components/add_coin_section.dart';
 import 'package:basic_landing_page/src/screen/components/balance_card.dart';
 import 'package:basic_landing_page/src/screen/components/coinTile.dart';
+import 'package:basic_landing_page/src/screen/transaction_details_screen.dart';
 import 'package:basic_landing_page/src/services/crypto_service.dart';
 import 'package:flutter/material.dart';
 import 'package:hive_flutter/hive_flutter.dart';
@@ -57,6 +58,21 @@ class _HomePageState extends State<HomePage> {
     myBox.put('myList', coinIds);
   }
 
+  double totalBalance = 0.0; //মোট ব্যালেন্স রাখার জন্য
+
+// 👇 এই ফাংশনটি হিসাব করবে
+  void _calculateTotalBalance() {
+    double total = 0.0;
+    for (var coin in myCoinList) {
+      total += coin.amountHeld * coin.price;
+    }
+
+    setState(() {
+      totalBalance = total;
+      balance += totalBalance;
+    });
+  }
+
   void addMoney() async {
     final newAmount = await Navigator.push(
       context,
@@ -109,6 +125,7 @@ class _HomePageState extends State<HomePage> {
     setState(() {
       isRefreshing = false;
     });
+    _calculateTotalBalance(); // 👇 এখানে কল করুন
   }
 
   @override
@@ -140,6 +157,10 @@ class _HomePageState extends State<HomePage> {
       ),
       body: Column(
         children: [
+          BalanceCard(
+            balance: formattedBalance,
+            onDeposit: addMoney,
+          ),
           AddCoinSection(onCoinAdded: (Coin newCoin) {
             setState(() {
               myCoinList.add(newCoin);
@@ -147,10 +168,6 @@ class _HomePageState extends State<HomePage> {
             updateDatabase();
             refreshAllCoinPrice();
           }),
-          BalanceCard(
-            balance: formattedBalance,
-            onDeposit: addMoney,
-          ),
           Expanded(
             child: Opacity(
               opacity: isRefreshing ? 0.5 : 1,
@@ -158,18 +175,33 @@ class _HomePageState extends State<HomePage> {
                   itemCount: myCoinList.length,
                   itemBuilder: (context, index) {
                     Coin currentCoin = myCoinList[index];
-                    return CoinTile(
-                      coin: currentCoin,
-                      onDelete: () {
-                        setState(() {
-                          myCoinList.removeAt(index);
-                        });
-                        ScaffoldMessenger.of(context).showSnackBar(SnackBar(
-                          content: Text("${currentCoin.name} removed!"),
-                          duration: Duration(seconds: 1),
-                        ));
-                        updateDatabase();
+                    return GestureDetector(
+                      onTap: () async {
+                        // 👇 পেজে যাওয়া
+                        await Navigator.push(
+                          context,
+                          MaterialPageRoute(
+                            builder: (context) => TransactionDetailsScreen(
+                                coin: myCoinList[index]),
+                          ),
+                        );
+
+                        // 👇 পেজ থেকে ফিরে আসার পর হিসাব আপডেট
+                        _calculateTotalBalance();
                       },
+                      child: CoinTile(
+                        coin: currentCoin,
+                        onDelete: () {
+                          setState(() {
+                            myCoinList.removeAt(index);
+                          });
+                          ScaffoldMessenger.of(context).showSnackBar(SnackBar(
+                            content: Text("${currentCoin.name} removed!"),
+                            duration: Duration(seconds: 1),
+                          ));
+                          updateDatabase();
+                        },
+                      ),
                     );
                   }),
             ),

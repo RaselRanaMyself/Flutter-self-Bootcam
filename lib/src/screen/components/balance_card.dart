@@ -13,21 +13,20 @@ class BalanceCard extends StatelessWidget {
   Widget build(BuildContext context) {
     return Container(
       width: double.infinity,
-      padding: EdgeInsets.all(24), // প্যাডিং বাড়ালাম
-      margin: EdgeInsets.only(bottom: 20, top: 10),
+      padding: const EdgeInsets.all(20),
+      margin: const EdgeInsets.all(20),
       decoration: BoxDecoration(
-        // সলিড কালারের বদলে গ্রেডিয়েন্ট ব্যবহার করছি
-        gradient: LinearGradient(
-          colors: [Colors.indigo.shade800, Colors.indigo.shade500],
+        gradient: const LinearGradient(
+          colors: [Colors.blue, Colors.purple], // সুন্দর গ্র্যাডিয়েন্ট
           begin: Alignment.topLeft,
           end: Alignment.bottomRight,
         ),
-        borderRadius: BorderRadius.circular(10),
+        borderRadius: BorderRadius.circular(20),
         boxShadow: [
           BoxShadow(
-            color: Colors.indigo.withOpacity(0.4),
+            color: Colors.blue.withOpacity(0.5),
             blurRadius: 10,
-            offset: Offset(0, 5),
+            offset: const Offset(0, 5),
           ),
         ],
       ),
@@ -37,20 +36,19 @@ class BalanceCard extends StatelessWidget {
           Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              Text(
-                "Total Balance",
-                style: TextStyle(fontSize: 18, color: Colors.white70),
+              const Text(
+                "Total Portfolio Balance",
+                style: TextStyle(color: Colors.white70, fontSize: 16),
               ),
-              SizedBox(height: 8),
+              const SizedBox(height: 10),
               Text(
-                balance,
+                balance, // 👈 এখানে টোটাল দেখাচ্ছি
                 style: const TextStyle(
                   color: Colors.white,
                   fontSize: 32,
                   fontWeight: FontWeight.bold,
-                  letterSpacing: 1.2, // অক্ষরগুলোর মাঝে ফাঁকা
                 ),
-              )
+              ),
             ],
           ),
 
@@ -78,3 +76,11 @@ class BalanceCard extends StatelessWidget {
     );
   }
 }
+
+
+//  Container(
+           
+//             child: Column(
+              
+//             ),
+//           ),

@@ -10,6 +10,7 @@ class Coin {
   double high24h;
   double low24h;
   List<double> sparklineIn7d;
+  double amountHeld;
 
   Coin({
     required this.id,
@@ -23,5 +24,6 @@ class Coin {
     this.high24h = 0,
     this.low24h = 0,
     this.sparklineIn7d = const [],
+    this.amountHeld = 0.0,
   });
 }
