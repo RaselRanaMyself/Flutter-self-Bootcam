@@ -3,19 +3,19 @@ import 'package:basic_landing_page/src/model/coin_model.dart';
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 
-class TransactionTile extends StatefulWidget {
+class CoinCard extends StatefulWidget {
   final Coin coin;
 
-  const TransactionTile({
+  const CoinCard({
     super.key,
     required this.coin,
   });
 
   @override
-  State<TransactionTile> createState() => _TransactionTileState();
+  State<CoinCard> createState() => _TransactionTileState();
 }
 
-class _TransactionTileState extends State<TransactionTile> {
+class _TransactionTileState extends State<CoinCard> {
   bool isLiked = false;
 
   void onPressed() {
@@ -50,10 +50,13 @@ class _TransactionTileState extends State<TransactionTile> {
         // crossAxisAlignment: CrossAxisAlignment.start,
         mainAxisAlignment: MainAxisAlignment.spaceAround,
         children: [
-          CircleAvatar(
-            radius: 25,
-            backgroundColor: Colors.grey.shade100,
-            backgroundImage: NetworkImage(widget.coin.image),
+          Hero(
+            tag: widget.coin.id,
+            child: CircleAvatar(
+              radius: 25,
+              backgroundColor: Colors.grey.shade100,
+              backgroundImage: NetworkImage(widget.coin.image),
+            ),
           ),
           const SizedBox(width: 10),
           Expanded(

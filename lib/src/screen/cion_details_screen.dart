@@ -1,6 +1,7 @@
 import 'package:basic_landing_page/src/model/coin_model.dart';
 import 'package:fl_chart/fl_chart.dart';
 import 'package:flutter/material.dart';
+import 'package:hive_flutter/hive_flutter.dart';
 
 class TransactionDetailsScreen extends StatefulWidget {
   final Coin coin;
@@ -46,14 +47,15 @@ class _TransactionDetailsScreenState extends State<TransactionDetailsScreen> {
             // Cancel Button
             TextButton(
               onPressed: () {
-                Navigator.pop(context); // ডায়ালগ বন্ধ
+                Navigator.pop(context);
+                // ডায়ালগ বন্ধ
               },
               child: const Text("Cancel"),
             ),
 
             // Confirm Buy Button
             ElevatedButton(
-              onPressed: () {
+              onPressed: () async {
                 // ১. ইনপুট থেকে সংখ্যা নেওয়া
                 double amountToBuy =
                     double.tryParse(amountController.text) ?? 0.0;
@@ -63,14 +65,118 @@ class _TransactionDetailsScreenState extends State<TransactionDetailsScreen> {
                   widget.coin.amountHeld += amountToBuy;
                 });
 
-                print("Bought: $amountToBuy ${widget.coin.symbol}");
-                print("Total Held: ${widget.coin.amountHeld}");
+                var box = Hive.box('cryptoBox');
+                // আমরা coin.id কে কি-ওয়ার্ড হিসেবে ব্যবহার করছি
+                await box.put(widget.coin.id, widget.coin.amountHeld);
+
+                // print("Bought: $amountToBuy ${widget.coin.symbol}");
+                // print("Total Held: ${widget.coin.amountHeld}");
 
                 // ৩. ডায়ালগ বন্ধ করা
                 Navigator.pop(context);
+                ScaffoldMessenger.of(context).showSnackBar(
+                  SnackBar(
+                    content: Text(
+                        "Successfully bought $amountToBuy ${widget.coin.symbol.toUpperCase()}!"),
+                    backgroundColor: Colors.green,
+                  ),
+                );
               },
               style: ElevatedButton.styleFrom(backgroundColor: Colors.green),
               child: const Text("Confirm Buy",
+                  style: TextStyle(color: Colors.white)),
+            ),
+          ],
+        );
+      },
+    );
+  }
+
+  // DetailsPage ক্লাসের ভেতরে
+
+  void _showSellDialog(BuildContext context) {
+    TextEditingController amountController = TextEditingController();
+
+    showDialog(
+      context: context,
+      builder: (context) {
+        return AlertDialog(
+          title: Text("Sell ${widget.coin.name}"),
+          content: Column(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              // ইউজারকে মনে করিয়ে দিচ্ছি তার কাছে কতগুলো আছে
+              Text(
+                "You own: ${widget.coin.amountHeld.toStringAsFixed(4)} ${widget.coin.symbol.toUpperCase()}",
+                style: const TextStyle(
+                    fontWeight: FontWeight.bold, color: Colors.blue),
+              ),
+              const SizedBox(height: 10),
+              TextField(
+                controller: amountController,
+                keyboardType: TextInputType.number,
+                decoration: const InputDecoration(
+                  labelText: "Amount to sell",
+                  hintText: "Ex: 0.5",
+                  border: OutlineInputBorder(),
+                ),
+              ),
+            ],
+          ),
+          actions: [
+            // Cancel Button
+            TextButton(
+              onPressed: () {
+                Navigator.pop(context);
+              },
+              child: const Text("Cancel"),
+            ),
+
+            // Confirm Sell Button
+            ElevatedButton(
+              onPressed: () async {
+                double amountToSell =
+                    double.tryParse(amountController.text) ?? 0.0;
+
+                // ১. ভ্যালিডেশন: জিরো বা নেগেটিভ ভ্যালু চেক
+                if (amountToSell <= 0) return;
+
+                // ২. ভ্যালিডেশন: ব্যালেন্সের চেয়ে বেশি বিক্রি করতে চাইলে
+                if (amountToSell > widget.coin.amountHeld) {
+                  Navigator.pop(context); // ডায়ালগ বন্ধ করব
+
+                  // এরর মেসেজ দেখাব
+                  ScaffoldMessenger.of(context).showSnackBar(
+                    const SnackBar(
+                      content: Text("Error: Not enough coins to sell!"),
+                      backgroundColor: Colors.red,
+                    ),
+                  );
+                  return; // এখানেই থেমে যাব, আর নিচে যাব না
+                }
+
+                // ৩. যদি সব ঠিক থাকে, তবে ব্যালেন্স কাটব
+                setState(() {
+                  widget.coin.amountHeld -= amountToSell;
+                });
+
+                // ৪. Hive এ আপডেট করা ডাটা সেভ করব
+                var box = Hive.box('cryptoBox');
+                await box.put(widget.coin.id, widget.coin.amountHeld);
+
+                Navigator.pop(context); // ডায়ালগ বন্ধ
+
+                // ৫. সাকসেস মেসেজ দেখাব
+                ScaffoldMessenger.of(context).showSnackBar(
+                  SnackBar(
+                    content: Text(
+                        "Successfully sold $amountToSell ${widget.coin.symbol.toUpperCase()}!"),
+                    backgroundColor: Colors.green,
+                  ),
+                );
+              },
+              style: ElevatedButton.styleFrom(backgroundColor: Colors.red),
+              child: const Text("Confirm Sell",
                   style: TextStyle(color: Colors.white)),
             ),
           ],
@@ -96,10 +202,13 @@ class _TransactionDetailsScreenState extends State<TransactionDetailsScreen> {
               mainAxisAlignment: MainAxisAlignment.center,
               children: [
                 // একটি বড় আইকন
-                CircleAvatar(
-                  radius: 50,
-                  backgroundColor: Colors.indigo.shade100,
-                  backgroundImage: NetworkImage(widget.coin.image),
+                Hero(
+                  tag: widget.coin.id,
+                  child: CircleAvatar(
+                    radius: 50,
+                    backgroundColor: Colors.indigo.shade100,
+                    backgroundImage: NetworkImage(widget.coin.image),
+                  ),
                 ),
                 const SizedBox(height: 30),
 
@@ -185,7 +294,9 @@ class _TransactionDetailsScreenState extends State<TransactionDetailsScreen> {
             // SELL Button
             Expanded(
               child: ElevatedButton(
-                onPressed: () {},
+                onPressed: () {
+                  _showSellDialog(context);
+                },
                 style: ElevatedButton.styleFrom(
                   backgroundColor: Colors.red,
                   padding: const EdgeInsets.symmetric(vertical: 15),

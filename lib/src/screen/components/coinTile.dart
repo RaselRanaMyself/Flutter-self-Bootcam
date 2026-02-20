@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:basic_landing_page/src/model/coin_model.dart'; // আপনার মডেল ইমপোর্ট করুন
-import 'package:basic_landing_page/src/screen/components/transactionTile.dart'; // পুরনো ডিজাইন টাইল
+import 'package:basic_landing_page/src/screen/components/coin_card.dart'; // পুরনো ডিজাইন টাইল
 
 class CoinTile extends StatelessWidget {
   final Coin coin;
@@ -56,7 +56,7 @@ class CoinTile extends StatelessWidget {
       },
 
       // ৫. চাইল্ড হিসেবে আপনার পুরনো সুন্দর ডিজাইনটি
-      child: TransactionTile(
+      child: CoinCard(
         coin: coin,
       ),
     );
