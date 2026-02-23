@@ -1,4 +1,4 @@
-import 'package:basic_landing_page/src/screen/home_screen.dart';
+import 'package:basic_landing_page/src/screen/main_screen.dart';
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 
@@ -14,7 +14,7 @@ class MyApp extends StatelessWidget {
         primarySwatch: Colors.indigo,
         useMaterial3: true,
       ),
-      home: HomePage(),
+      home: MainScreen(),
     );
   }
 }
